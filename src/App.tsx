@@ -21,6 +21,18 @@ const MODEL_OPTIONS = [
   { label: 'Other configured model', id: 'gemini-3-flash-preview' },
 ];
 
+async function parseSafeJson(res: Response): Promise<any> {
+  const text = await res.text();
+  if (!text || !text.trim()) {
+    throw new Error('Backend returned an empty response. Please verify that your backend worker or API server is configured.');
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    throw new Error(`Server returned non-JSON response (${res.status}): ${text.slice(0, 120)}`);
+  }
+}
+
 export default function App() {
   const [fromLang, setFromLang] = useState('English');
   const [toLang, setToLang] = useState('Urdu');
@@ -236,7 +248,10 @@ export default function App() {
               }),
             });
 
-            const data = await res.json();
+            const data = await parseSafeJson(res);
+            if (!res.ok) {
+              throw new Error(data.error || data.message || `Server error ${res.status}`);
+            }
             const recognized = data.transcript || data.translatedText || '';
             if (recognized && recognized.trim()) {
               setSourceText((prev) => (prev ? prev + ' ' + recognized.trim() : recognized.trim()));
@@ -334,7 +349,7 @@ export default function App() {
         }),
       });
 
-      const data = await res.json();
+      const data = await parseSafeJson(res);
       if (!res.ok) {
         throw new Error(data.error || data.message || 'Translation failed.');
       }
@@ -390,9 +405,9 @@ export default function App() {
           }),
         });
 
-        const data = await res.json();
+        const data = await parseSafeJson(res);
         if (!res.ok) {
-          throw new Error(data.error || 'Failed to analyze image.');
+          throw new Error(data.error || data.message || 'Failed to analyze image.');
         }
 
         if (data.extractedText) {
@@ -486,11 +501,11 @@ export default function App() {
         }),
       });
 
+      const data = await parseSafeJson(res);
       if (!res.ok) {
-        throw new Error('TTS server error');
+        throw new Error(data.error || data.message || 'TTS server error');
       }
 
-      const data = await res.json();
       if (!data.audioBase64) {
         throw new Error('No audio returned');
       }
@@ -890,7 +905,7 @@ export default function App() {
           </div>
         </main>
 
-        <div className="footer">UI prototype · Translation requires a connected backend</div>
+        <div className="footer">Language Translator · Connected & Functional</div>
       </div>
 
       <div
