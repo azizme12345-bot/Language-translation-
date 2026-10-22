@@ -231,7 +231,17 @@ Rules:
       })
     );
 
-    const translation = response.text ? response.text.trim() : '';
+    const responseText = response.text ? response.text.trim() : '';
+
+    let translation = responseText;
+    try {
+      const parsed = JSON.parse(responseText);
+      if (parsed.translation) {
+        translation = parsed.translation;
+      }
+    } catch {
+      // It's plain text, use as is
+    }
 
     if (!translation) {
       res.status(500).json({ error: 'Received an empty translation from the AI model.' });
