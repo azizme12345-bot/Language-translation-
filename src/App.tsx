@@ -974,7 +974,7 @@ export default function App() {
           <div className="model-list" id="models">
             {MODEL_OPTIONS.map((m, idx) => (
               <button
-                key={m.id}
+                key={`${m.id}-${m.label}-${idx}`}
                 type="button"
                 className={selectedModelIndex === idx ? 'active' : ''}
                 onClick={() => {
