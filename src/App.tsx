@@ -237,9 +237,10 @@ export default function App() {
             });
 
             const data = await res.json();
-            if (data.transcript && data.transcript.trim()) {
-              setSourceText((prev) => (prev ? prev + ' ' + data.transcript.trim() : data.transcript.trim()));
-              setStatusText(`Recognized: "${data.transcript.trim()}"`);
+            const recognized = data.transcript || data.translatedText || '';
+            if (recognized && recognized.trim()) {
+              setSourceText((prev) => (prev ? prev + ' ' + recognized.trim() : recognized.trim()));
+              setStatusText(`Recognized: "${recognized.trim()}"`);
             } else {
               setStatusText('No clear speech detected. Please speak into your microphone.');
             }
@@ -335,10 +336,11 @@ export default function App() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || 'Translation failed.');
+        throw new Error(data.error || data.message || 'Translation failed.');
       }
 
-      setResultText(data.translation || '');
+      const translation = data.translation || data.translatedText || '';
+      setResultText(translation);
       setStatusText('Translation complete.');
     } catch (err: any) {
       console.error('Translate error:', err);
