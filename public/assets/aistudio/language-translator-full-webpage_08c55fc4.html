@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#e4f4f0">
+<title>Language Translator — Refined UI</title>
+<style>
+:root{color-scheme:light;--page:#e4f4f0;--card:#f4fbf8;--header:#c6e5d9;--green:#168f70;--green2:#08765a;--ink:#18231f;--muted:#5c6d66;--edge:#b9d0c8;--shadow:0 5px 18px #203e3316}
+*{box-sizing:border-box}body{margin:0;background:var(--page);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;padding:0;min-height:100vh}
+body.dark{color-scheme:dark;--page:#14231c;--card:#1c3027;--header:#244c3a;--green:#159875;--green2:#0b765b;--ink:#eef8f2;--muted:#b6c9bf;--edge:#456354;--shadow:0 5px 18px #0003}
+.app{width:100%;margin:0;border:0;border-radius:0;background:var(--card);box-shadow:none;overflow:visible;min-height:100vh}
+body.dark .app{border:0}
+header{min-height:78px;background:var(--header);display:flex;align-items:center;gap:11px;padding:12px 14px}
+.logo{width:48px;height:48px;flex:0 0 48px;border-radius:14px;background:linear-gradient(145deg,#a4e2b7,#16845d);display:grid;place-items:center;color:white;font-weight:800;font-size:20px;box-shadow:inset 0 0 0 2px #ffffff65}
+.brand{min-width:0;flex:1}.brand strong{display:block;font-size:17px;line-height:1.2}.brand small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.iconbtn{border:1px solid var(--edge);background:var(--card);color:var(--ink);border-radius:12px;min-width:42px;min-height:42px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:8px;box-shadow:var(--shadow)}
+.iconbtn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+header .iconbtn{border:0;background:transparent;box-shadow:none}
+main{padding:15px}
+.languages{display:grid;grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr);gap:8px;align-items:center;margin-bottom:14px}
+.languages select{width:100%;min-width:0;border:1px solid var(--edge);background:var(--card);color:var(--ink);border-radius:13px;padding:12px 9px;font-size:14px;box-shadow:var(--shadow)}
+.swap{height:42px;border:1px solid var(--edge);border-radius:13px;background:var(--card);color:var(--green);font-size:23px;cursor:pointer}
+.panel{background:var(--card);border:1px solid var(--edge);border-radius:19px;box-shadow:var(--shadow);padding:13px}
+textarea{width:100%;height:150px;resize:vertical;display:block;border:0;outline:0;background:transparent;color:var(--ink);font:15px/1.55 inherit;padding:2px}
+textarea::placeholder{color:var(--muted);opacity:1}
+.toolrow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--edge);padding-top:11px;margin-top:8px}
+.tool{display:flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:8px 10px;border:1px solid var(--edge);border-radius:12px;background:var(--card);color:var(--ink);font-size:12px;font-weight:650;cursor:pointer}
+.tool svg{width:20px;height:20px;stroke:var(--green2);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tool.clear{margin-left:auto;color:var(--muted)}
+.primary{width:100%;min-height:48px;margin:14px 0;border:0;border-radius:12px;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;font-weight:750;font-size:15px;box-shadow:0 4px 10px #08765a25;cursor:pointer}
+.resulthead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.resulthead strong{font-size:14px}.resulttools{display:flex;gap:7px}.resulttext{min-height:105px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;color:var(--ink)}
+.status{font-size:12px;color:var(--muted);min-height:18px;margin-top:8px}
+.footer{text-align:center;color:var(--muted);font-size:11px;padding:0 14px 14px}
+.shade{display:none;position:fixed;inset:0;background:#07150f80;z-index:5;padding:12px;justify-content:flex-end}.shade.show{display:flex}
+.drawer{width:min(350px,100%);height:100%;overflow:auto;background:var(--card);border:1px solid var(--edge);border-radius:20px;padding:17px;box-shadow:0 15px 40px #0003}
+.drawerhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;font-size:18px;font-weight:750}
+.label{display:block;font-size:13px;font-weight:650;margin:16px 0 7px}
+.drawer select,.drawer input{width:100%;padding:11px;border:1px solid var(--edge);border-radius:11px;background:var(--card);color:var(--ink)}
+.install{width:100%;padding:12px;border:0;border-radius:11px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}
+.model-list{display:grid;gap:7px}.model-list button{text-align:left;padding:11px;border:1px solid var(--edge);border-radius:10px;background:transparent;color:var(--ink);cursor:pointer}.model-list button.active{border-color:var(--green);background:#168f7018}
+.note{font-size:12px;color:var(--muted);line-height:1.5}
+input[type=file]{display:none}
+@media(min-width:720px){body{padding:0}.app{width:100%}}
+@media(max-width:360px){body{padding:0}.app{border-width:0;border-radius:0}main{padding:10px}.tool{flex:1;padding:8px 5px}.tool span{font-size:11px}.languages select{font-size:12px;padding:11px 5px}.brand strong{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="logo" aria-hidden="true">A文</div>
+ <div class="brand"><strong>Language Translator</strong><small>Translation workspace</small></div>
+ <button class="iconbtn" id="theme" aria-label="Toggle light and dark mode" title="Toggle theme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
+ <button class="iconbtn" id="menu" aria-label="Open settings" title="Settings"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+</header>
+<main>
+ <div class="languages">
+  <select id="from" aria-label="Source language"><option>English</option><option>Urdu</option><option>Hindi</option><option>Punjabi</option><option>Arabic</option><option>French</option><option>Spanish</option></select>
+  <button class="swap" id="swap" aria-label="Swap languages" title="Swap languages">⇄</button>
+  <select id="to" aria-label="Target language"><option>Urdu</option><option>English</option><option>Hindi</option><option>Punjabi</option><option>Arabic</option><option>French</option><option>Spanish</option></select>
+ </div>
+ <section class="panel">
+  <textarea id="source" placeholder="Type or paste text here…" aria-label="Text to translate"></textarea>
+  <div class="toolrow">
+   <button class="tool" id="mic" title="Speech input"><svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"/></svg><span>Mic</span></button>
+   <button class="tool" id="camera" title="Choose image"><svg viewBox="0 0 24 24"><path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></svg><span>Camera / Image</span></button>
+   <button class="tool" id="file" title="Upload file"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8"/></svg><span>File</span></button>
+   <button class="tool" id="paste" title="Paste from clipboard"><svg viewBox="0 0 24 24"><rect x="8" y="3" width="12" height="17" rx="2"/><path d="M16 3V2H6a2 2 0 0 0-2 2v14h4M11 8h6M11 12h6M11 16h4"/></svg><span>Paste</span></button>
+   <button class="tool clear" id="clear">Clear</button>
+   <input type="file" id="imageFile" accept="image/*" capture="environment">
+   <input type="file" id="anyFile" accept="image/*,.txt">
+  </div>
+ </section>
+ <button class="primary" id="translate">Translate / Analyze</button>
+ <section class="panel">
+  <div class="resulthead"><strong>Translation result</strong><div class="resulttools">
+   <button class="iconbtn" id="listen" title="Listen to result" aria-label="Listen"><svg viewBox="0 0 24 24"><path d="M4 10v4h4l5 4V6l-5 4H4Z"/><path d="M17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/></svg></button>
+   <button class="iconbtn" id="copy" title="Copy result" aria-label="Copy"><svg viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button>
+   <button class="iconbtn" id="share" title="Share result" aria-label="Share"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.7 10.7 6.6-4.4m-6.6 9 6.6 2.9"/></svg></button>
+  </div></div>
+  <div class="resulttext" id="result">Translation will appear here…</div>
+ </section>
+ <div class="status" id="status" role="status"></div>
+</main><div class="footer">UI prototype · Translation requires a connected backend</div>
+</div>
+<div class="shade" id="shade"><aside class="drawer">
+ <div class="drawerhead"><span>⚙ Settings</span><button class="iconbtn" id="close" aria-label="Close settings">×</button></div>
+ <label class="label" for="appLanguage">App language</label><select id="appLanguage"><option>English</option><option>Urdu</option><option>Hindi</option></select>
+ <label class="label">Install App (PWA)</label><button class="install" id="install">Install App</button>
+ <label class="label" for="api">Gemini API Key</label><input id="api" type="password" placeholder="Enter API key (prototype only)" autocomplete="off">
+ <label class="label">Gemini AI Model Versions</label><div class="model-list" id="models"><button class="active">Gemini Flash — fast</button><button>Gemini Pro — advanced</button><button>Other configured model</button></div>
+ <p class="note">This is a UI prototype. Do not enter a real API key here; secure translation requires a server-side backend.</p>
+ <label class="label">App Info</label><div class="note">Language Translator · UI preview</div>
+</aside></div>
+<script>
+const $=id=>document.getElementById(id);
+$('menu').onclick=()=>$('shade').classList.add('show');
+$('close').onclick=()=>$('shade').classList.remove('show');
+$('shade').onclick=e=>{if(e.target===$('shade'))$('shade').classList.remove('show')};
+$('theme').onclick=()=>document.body.classList.toggle('dark');
+$('swap').onclick=()=>{const a=$('from').value;$('from').value=$('to').value;$('to').value=a};
+$('clear').onclick=()=>{$('source').value='';$('result').textContent='Translation will appear here…';$('status').textContent=''};
+$('camera').onclick=()=>$('imageFile').click();$('file').onclick=()=>$('anyFile').click();
+$('imageFile').onchange=e=>{const f=e.target.files[0];if(f)$('status').textContent='Selected image: '+f.name+'. Image translation is not connected in this prototype.'};
+$('anyFile').onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.type.startsWith('text/')){const r=new FileReader();r.onload=()=>{$('source').value=r.result};r.readAsText(f)}else $('status').textContent='Selected file: '+f.name+'. Image analysis needs a backend.'};
+$('paste').onclick=async()=>{try{$('source').value=await navigator.clipboard.readText();$('status').textContent='Pasted from clipboard.'}catch(e){$('status').textContent='Long-press the text box and choose Paste.'}};
+$('mic').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){$('status').textContent='Speech recognition is not supported in this browser.';return}const r=new SR();r.lang=$('from').value==='Urdu'?'ur-PK':$('from').value==='Punjabi'?'pa-PK':$('from').value==='Hindi'?'hi-IN':'en-US';r.onresult=e=>$('source').value=e.results[0][0].transcript;r.onerror=()=>$('status').textContent='Microphone permission or speech recognition error.';r.start();$('status').textContent='Listening…'};
+$('translate').onclick=()=>$('status').textContent='Preview only: connect a secure translation backend for real translation.';
+$('copy').onclick=async()=>{try{await navigator.clipboard.writeText($('result').textContent);$('status').textContent='Copied result.'}catch(e){$('status').textContent='Select and copy the result manually.'}};
+$('listen').onclick=()=>{if(!('speechSynthesis'in window)){$('status').textContent='Text-to-speech is not supported in this browser.';return}const u=new SpeechSynthesisUtterance($('result').textContent);u.lang=$('to').value==='Urdu'?'ur-PK':$('to').value==='Punjabi'?'pa-PK':$('to').value==='Hindi'?'hi-IN':'en-US';speechSynthesis.speak(u)};
+$('share').onclick=async()=>{if(navigator.share){try{await navigator.share({title:'Language Translator',text:$('result').textContent})}catch(e){}}else $('status').textContent='Sharing is not supported in this browser.'};
+$('models').onclick=e=>{if(e.target.tagName!=='BUTTON')return;[...$('models').children].forEach(b=>b.classList.remove('active'));e.target.classList.add('active')};
+$('install').onclick=()=>$('status').textContent='For installation, a valid manifest, service worker and HTTPS hosting are still required.';
+</script>
+</body></html>
