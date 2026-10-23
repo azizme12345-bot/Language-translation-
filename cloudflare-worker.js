@@ -20,9 +20,9 @@ export default {
       });
     };
 
-    const apiKey = (env.API_KEY || env.GEMINI_API_KEY || request.headers.get('x-gemini-api-key') || '').trim();
+    const apiKey = (env.GEMINI_API_KEY || env.API_KEY || request.headers.get('x-gemini-api-key') || '').trim();
     if (!apiKey) {
-      return jsonResponse({ status: 'error', error: 'API_KEY is missing' }, 401);
+      return jsonResponse({ status: 'error', error: 'GEMINI_API_KEY or API_KEY is missing in Cloudflare variables' }, 401);
     }
 
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
@@ -32,8 +32,16 @@ export default {
         return jsonResponse({ status: 'ok', hasApiKey: true });
       }
 
+      // Read raw body once to avoid stream locking issues
+      let bodyData = {};
+      try {
+        bodyData = await request.json();
+      } catch {
+        bodyData = {};
+      }
+
       if (pathname === '/api/translate' && request.method === 'POST') {
-        const { text, from, to } = await request.json().catch(() => ({}));
+        const { text, from, to } = bodyData;
         if (!text || !text.trim()) {
           return jsonResponse({ status: 'error', error: 'No text provided' }, 400);
         }
@@ -54,7 +62,7 @@ export default {
       }
 
       if (pathname === '/api/transcribe' && request.method === 'POST') {
-        const { audioBase64, mimeType, lang } = await request.json().catch(() => ({}));
+        const { audioBase64, mimeType, lang } = bodyData;
         if (!audioBase64) {
           return jsonResponse({ status: 'error', error: 'No audio provided' }, 400);
         }
@@ -80,7 +88,7 @@ export default {
       }
 
       if (pathname === '/api/analyze-image' && request.method === 'POST') {
-        const { imageBase64, mimeType, to } = await request.json().catch(() => ({}));
+        const { imageBase64, mimeType, to } = bodyData;
         if (!imageBase64) {
           return jsonResponse({ status: 'error', error: 'No image provided' }, 400);
         }
@@ -114,7 +122,7 @@ export default {
       }
 
       if (pathname === '/api/tts' && request.method === 'POST') {
-        const { text } = await request.json().catch(() => ({}));
+        const { text } = bodyData;
         if (!text) {
           return jsonResponse({ status: 'error', error: 'No text provided' }, 400);
         }
@@ -144,6 +152,6 @@ export default {
       return jsonResponse({ status: 'error', error: err.message }, 500);
     }
 
-    return jsonResponse({ status: 'error', error: 'Not found' }, 404);
+    return jsonResponse({ status: 'error', error: `Route ${pathname} not found` }, 404);
   }
 };

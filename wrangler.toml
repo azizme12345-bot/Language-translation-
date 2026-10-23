@@ -1,0 +1,6 @@
+name = "language-translation"
+main = "worker.js"
+compatibility_date = "2024-03-20"
+
+[vars]
+# Add non-secret variables here if needed
