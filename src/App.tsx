@@ -334,7 +334,7 @@ export default function App() {
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      if (customApiKey && customApiKey.trim().length >= 30) {
+      if (customApiKey && customApiKey.trim().length >= 10) {
         headers['x-gemini-api-key'] = customApiKey.trim();
       }
 
