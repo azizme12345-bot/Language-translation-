@@ -2,5 +2,8 @@ name = "language-translation"
 main = "worker.js"
 compatibility_date = "2024-03-20"
 
+[assets]
+directory = "./dist"
+
 [vars]
-# Add non-secret variables here if needed
+
