@@ -1,3 +1,43 @@
+function pcmToWavBase64(pcmBase64, sampleRate = 24000) {
+  const binaryString = atob(pcmBase64);
+  const dataSize = binaryString.length;
+  const numChannels = 1;
+  const bitDepth = 16;
+  const byteRate = (sampleRate * numChannels * bitDepth) / 8;
+  const blockAlign = (numChannels * bitDepth) / 8;
+
+  const header = new ArrayBuffer(44);
+  const view = new DataView(header);
+
+  function writeString(offset, string) {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  }
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + dataSize, true);
+  writeString(8, 'WAVE');
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true); // PCM format
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, byteRate, true);
+  view.setUint16(32, blockAlign, true);
+  view.setUint16(34, bitDepth, true);
+  writeString(36, 'data');
+  view.setUint32(40, dataSize, true);
+
+  const headerBytes = new Uint8Array(header);
+  let headerBinary = '';
+  for (let i = 0; i < headerBytes.length; i++) {
+    headerBinary += String.fromCharCode(headerBytes[i]);
+  }
+
+  return btoa(headerBinary + binaryString);
+}
+
 export default {
   async fetch(request, env, ctx) {
     const corsHeaders = {
@@ -25,7 +65,6 @@ export default {
       return jsonResponse({ status: 'error', error: 'GEMINI_API_KEY is missing in Cloudflare variables' }, 401);
     }
 
-    // Active verified models supported by the v1beta API
     const MODELS = ['gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-2.5-flash-lite'];
 
     async function callGemini(contents, generationConfig = {}) {
@@ -72,15 +111,16 @@ export default {
         const sourceLang = from || 'English';
         const targetLang = to || 'Urdu';
 
-        const prompt = `You are a professional translator. Translate the following text accurately from ${sourceLang} to ${targetLang}.
-Rules:
-1. Return ONLY the translated text. Do not include notes, conversational greetings, explanations, or quotes.
-2. Preserve formatting.
+        const prompt = `Translate the following text faithfully from ${sourceLang} to ${targetLang}.
+CRITICAL ACCURACY RULES:
+1. Translate names, proper nouns, and person identities with 100% exact phonetic accuracy. DO NOT alter, replace, or guess any person's name (e.g. 'Abdul aziz' MUST be translated as 'عبدالعزیز' or 'عبد العزیز', NEVER as 'عبداللطیف' or any different name).
+2. Output ONLY the translated text, with no explanations, notes, or extra characters.
+3. Preserve original capitalization and punctuation where appropriate.
 
 Text:
 ${text.trim()}`;
 
-        const data = await callGemini([{ parts: [{ text: prompt }] }], { temperature: 0.2 });
+        const data = await callGemini([{ parts: [{ text: prompt }] }], { temperature: 0.0 });
         const translation = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
         return jsonResponse({ status: 'success', translation, translatedText: translation });
@@ -97,9 +137,9 @@ ${text.trim()}`;
         const data = await callGemini([{
           parts: [
             { inlineData: { mimeType: mimeType || 'audio/webm', data: cleanBase64 } },
-            { text: `Transcribe this audio in ${language}. Return ONLY the transcribed text.` }
+            { text: `Transcribe this audio in ${language}. Return ONLY the transcribed text accurately.` }
           ]
-        }]);
+        }], { temperature: 0.0 });
 
         const transcript = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
         return jsonResponse({ status: 'success', transcript, translatedText: transcript });
@@ -133,7 +173,7 @@ ${text.trim()}`;
 
       if (pathname === '/api/tts' && request.method === 'POST') {
         const { text } = bodyData;
-        if (!text) {
+        if (!text || !text.trim()) {
           return jsonResponse({ status: 'error', error: 'No text provided' }, 400);
         }
 
@@ -152,13 +192,14 @@ ${text.trim()}`;
 
           if (res.ok) {
             const resData = await res.json();
-            const base64Audio = resData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-            if (base64Audio) {
-              return jsonResponse({ status: 'success', audioBase64: base64Audio, mimeType: 'audio/wav' });
+            const pcmAudio = resData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+            if (pcmAudio) {
+              const wavAudio = pcmToWavBase64(pcmAudio, 24000);
+              return jsonResponse({ status: 'success', audioBase64: wavAudio, mimeType: 'audio/wav' });
             }
           }
         } catch {
-          // fallback to browser speech
+          // fallback
         }
 
         return jsonResponse({ status: 'fallback', message: 'Use browser speech' });
