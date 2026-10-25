@@ -56,18 +56,19 @@ export default {
 
     // 1. Robots.txt for Google Search Console, Bing, and Web Crawlers
     if (pathname === '/robots.txt') {
-      const robots = `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`;
+      const robots = `User-agent: *\nAllow: /\nDisallow: /api/\n\nUser-agent: Googlebot\nAllow: /\nDisallow: /api/\n\nUser-agent: Bingbot\nAllow: /\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`;
       return new Response(robots, {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
           'Cache-Control': 'public, max-age=3600',
+          'X-Robots-Tag': 'index, follow',
           ...corsHeaders,
         },
       });
     }
 
-    // 2. Dynamic Sitemap.xml matching requested host (Googlebot friendly)
-    if (pathname === '/sitemap.xml') {
+    // 2. Dynamic Sitemap.xml matching requested host (Googlebot & Bing friendly)
+    if (pathname === '/sitemap.xml' || pathname === '/sitemap_index.xml' || pathname === '/sitemap') {
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -100,6 +101,7 @@ export default {
         headers: {
           'Content-Type': 'application/xml; charset=utf-8',
           'Cache-Control': 'public, max-age=3600',
+          'X-Robots-Tag': 'index, follow',
           ...corsHeaders,
         },
       });

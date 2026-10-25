@@ -978,45 +978,6 @@ export default function App() {
             Install App
           </button>
 
-          <label className="label" htmlFor="api">
-            Gemini API Key
-          </label>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <input
-              id="api"
-              type="password"
-              placeholder="AI Studio key configured (or enter custom key)"
-              autoComplete="off"
-              value={customApiKey}
-              onChange={(e) => setCustomApiKey(e.target.value)}
-              style={{ flex: 1 }}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                try {
-                  localStorage.setItem('gemini_api_key', customApiKey);
-                  setStatusText('Saved successfully');
-                } catch {
-                  setStatusText('Saved successfully');
-                }
-              }}
-              style={{
-                padding: '11px 14px',
-                background: 'var(--green)',
-                color: '#fff',
-                border: '0',
-                borderRadius: '11px',
-                fontWeight: 700,
-                fontSize: '13px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              Save
-            </button>
-          </div>
-
           <label className="label">Gemini AI Model Versions</label>
           <div className="model-list" id="models">
             {MODEL_OPTIONS.map((m, idx) => (
