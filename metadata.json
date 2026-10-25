@@ -1,6 +1,6 @@
 {
-  "name": "Language Translator",
-  "description": "Multi-language text translation and image vision text extraction powered by Gemini AI with PWA support.",
+  "name": "English to Urdu Translator",
+  "description": "Free online English and Urdu translator. Translate by typing, speaking, camera or file upload, and listen to the translation.",
   "requestFramePermissions": ["clipboard-read", "clipboard-write", "microphone", "camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

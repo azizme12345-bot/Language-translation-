@@ -1,11 +1,10 @@
-const CACHE_NAME = 'translator-cache-v1';
+const CACHE_NAME = 'translator-cache-v2';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/icon.svg',
-  '/pwa-192x192.png',
-  '/pwa-512x512.png',
+  '/icon-192.png',
+  '/icon-512.png',
   '/apple-touch-icon.png'
 ];
 

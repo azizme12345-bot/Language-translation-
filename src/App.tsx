@@ -103,6 +103,12 @@ export default function App() {
     };
   }, []);
 
+  // Set the page language tag to match the app language (en for English, ur for Urdu)
+  useEffect(() => {
+    const langCode = appLanguage.toLowerCase().startsWith('ur') ? 'ur' : 'en';
+    document.documentElement.lang = langCode;
+  }, [appLanguage]);
+
   const toggleTheme = () => {
     const isDark = document.body.classList.toggle('dark');
     try {
@@ -902,6 +908,18 @@ export default function App() {
 
           <div className="status" id="status" role="status">
             {statusText}
+          </div>
+
+          <div
+            className="app-description"
+            style={{
+              marginTop: '14px',
+              fontSize: '13px',
+              lineHeight: '1.6',
+              color: 'var(--muted)',
+            }}
+          >
+            This is an online English and Urdu translator. You can type text and get the translation instantly. Press the mic button to translate by speaking. Take a photo with the camera to translate the text in it. Upload an image or a file to translate its content. You can listen to the translation with the audio button. Copy the translation easily and use it anywhere. You can also share it with others using the share button.
           </div>
         </main>
 
