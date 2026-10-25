@@ -109,6 +109,18 @@ export default function App() {
     document.documentElement.lang = langCode;
   }, [appLanguage]);
 
+  // Initialize language direction based on URL route (e.g. /urdu-to-english or /english-to-urdu)
+  useEffect(() => {
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('urdu-to-english')) {
+      setFromLang('Urdu');
+      setToLang('English');
+    } else if (path.includes('english-to-urdu')) {
+      setFromLang('English');
+      setToLang('Urdu');
+    }
+  }, []);
+
   const toggleTheme = () => {
     const isDark = document.body.classList.toggle('dark');
     try {

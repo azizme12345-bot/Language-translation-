@@ -52,6 +52,69 @@ export default {
 
     const url = new URL(request.url);
     const pathname = url.pathname;
+    const origin = url.origin || `https://${url.host}`;
+
+    // 1. Robots.txt for Google Search Console, Bing, and Web Crawlers
+    if (pathname === '/robots.txt') {
+      const robots = `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${origin}/sitemap.xml\n`;
+      return new Response(robots, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600',
+          ...corsHeaders,
+        },
+      });
+    }
+
+    // 2. Dynamic Sitemap.xml matching requested host (Googlebot friendly)
+    if (pathname === '/sitemap.xml') {
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>${origin}/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="${origin}/" />
+    <xhtml:link rel="alternate" hreflang="ur" href="${origin}/" />
+  </url>
+  <url>
+    <loc>${origin}/english-to-urdu</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="${origin}/english-to-urdu" />
+    <xhtml:link rel="alternate" hreflang="ur" href="${origin}/english-to-urdu" />
+  </url>
+  <url>
+    <loc>${origin}/urdu-to-english</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ur" href="${origin}/urdu-to-english" />
+    <xhtml:link rel="alternate" hreflang="en" href="${origin}/urdu-to-english" />
+  </url>
+</urlset>`;
+      return new Response(sitemap, {
+        headers: {
+          'Content-Type': 'application/xml; charset=utf-8',
+          'Cache-Control': 'public, max-age=3600',
+          ...corsHeaders,
+        },
+      });
+    }
+
+    // 3. Static assets & SPA client routing (prevent 404 for /english-to-urdu, /urdu-to-english, etc.)
+    if (env.ASSETS && !pathname.startsWith('/api/')) {
+      const assetRes = await env.ASSETS.fetch(request);
+      if (assetRes.status !== 404) {
+        return assetRes;
+      }
+      if (request.method === 'GET') {
+        return env.ASSETS.fetch(new Request(new URL('/', request.url), request));
+      }
+    }
 
     const jsonResponse = (data, status = 200) => {
       return new Response(JSON.stringify(data), {
@@ -60,6 +123,7 @@ export default {
       });
     };
 
+    // 4. API Endpoints
     const apiKey = (env.GEMINI_API_KEY || env.API_KEY || request.headers.get('x-gemini-api-key') || '').trim();
     if (!apiKey) {
       return jsonResponse({ status: 'error', error: 'GEMINI_API_KEY is missing in Cloudflare variables' }, 401);

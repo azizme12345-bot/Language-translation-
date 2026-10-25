@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://language-translation.azizme12345.workers.dev/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://language-translation.azizme12345.workers.dev/" />
+    <xhtml:link rel="alternate" hreflang="ur" href="https://language-translation.azizme12345.workers.dev/" />
+  </url>
+  <url>
+    <loc>https://language-translation.azizme12345.workers.dev/english-to-urdu</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://language-translation.azizme12345.workers.dev/english-to-urdu" />
+    <xhtml:link rel="alternate" hreflang="ur" href="https://language-translation.azizme12345.workers.dev/english-to-urdu" />
+  </url>
+  <url>
+    <loc>https://language-translation.azizme12345.workers.dev/urdu-to-english</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="ur" href="https://language-translation.azizme12345.workers.dev/urdu-to-english" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://language-translation.azizme12345.workers.dev/urdu-to-english" />
+  </url>
+</urlset>

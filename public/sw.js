@@ -31,8 +31,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Never cache API requests
-  if (event.request.url.includes('/api/')) {
+  // Never cache API, sitemap, or robots requests
+  if (
+    event.request.url.includes('/api/') ||
+    event.request.url.includes('/sitemap.xml') ||
+    event.request.url.includes('/robots.txt')
+  ) {
     return;
   }
 
