@@ -109,15 +109,25 @@ export default function App() {
     document.documentElement.lang = langCode;
   }, [appLanguage]);
 
-  // Initialize language direction based on URL route (e.g. /urdu-to-english or /english-to-urdu)
+  // Initialize language direction and update SEO title/description based on URL route
   useEffect(() => {
     const path = window.location.pathname.toLowerCase();
+    const titleEl = document.querySelector('title');
+    const descEl = document.querySelector('meta[name="description"]');
+
     if (path.includes('urdu-to-english')) {
       setFromLang('Urdu');
       setToLang('English');
+      if (titleEl) titleEl.textContent = 'Urdu to English Translator · Free Online Translation';
+      if (descEl) descEl.setAttribute('content', 'Free online Urdu to English translator. Translate Urdu text, speech, camera and files instantly with accurate AI translation.');
     } else if (path.includes('english-to-urdu')) {
       setFromLang('English');
       setToLang('Urdu');
+      if (titleEl) titleEl.textContent = 'English to Urdu Translator · Free Online Translation';
+      if (descEl) descEl.setAttribute('content', 'Free online English to Urdu translator. Translate English text, speech, camera and files instantly with accurate AI translation.');
+    } else {
+      if (titleEl) titleEl.textContent = 'English to Urdu Translator';
+      if (descEl) descEl.setAttribute('content', 'Free online English and Urdu translator. Translate by typing, speaking, camera or file upload, and listen to the translation.');
     }
   }, []);
 
@@ -684,13 +694,19 @@ export default function App() {
 
   return (
     <>
-      <div className="app">
-        <header>
+      <div className="app" id="home">
+        <header className="topbar">
           <div className="logo" aria-hidden="true">A文</div>
           <div className="brand">
             <strong>Language Translator</strong>
-            <small>Translation workspace</small>
+            <span>Translate · Type · Listen · Connect</span>
           </div>
+          <nav className="webnav" aria-label="Main navigation">
+            <a href="#translator">Translator</a>
+            <a href="#tools">Tools</a>
+            <a href="#languages">Languages</a>
+            <a href="#about">About</a>
+          </nav>
           <button
             className="iconbtn"
             id="theme"
@@ -704,228 +720,345 @@ export default function App() {
             </svg>
           </button>
           <button
-            className="iconbtn"
+            className="menu"
             id="menu"
             onClick={() => setDrawerOpen(true)}
             aria-label="Open settings"
             title="Settings"
           >
-            <svg viewBox="0 0 24 24">
-              <path d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            ☰
           </button>
         </header>
 
-        <main>
-          <div className="languages">
-            <select
-              id="from"
-              aria-label="Source language"
-              value={fromLang}
-              onChange={(e) => setFromLang(e.target.value)}
-            >
-              <option>English</option>
-              <option>Urdu</option>
-              <option>Hindi</option>
-              <option>Punjabi</option>
-              <option>Arabic</option>
-              <option>French</option>
-              <option>Spanish</option>
-            </select>
-            <button
-              className="swap"
-              id="swap"
-              onClick={handleSwap}
-              aria-label="Swap languages"
-              title="Swap languages"
-            >
-              ⇄
-            </button>
-            <select
-              id="to"
-              aria-label="Target language"
-              value={toLang}
-              onChange={(e) => setToLang(e.target.value)}
-            >
-              <option>Urdu</option>
-              <option>English</option>
-              <option>Hindi</option>
-              <option>Punjabi</option>
-              <option>Arabic</option>
-              <option>French</option>
-              <option>Spanish</option>
-            </select>
-          </div>
-
-          <section className="panel">
-            <textarea
-              id="source"
-              placeholder="Type or paste text here…"
-              aria-label="Text to translate"
-              value={sourceText}
-              onChange={(e) => setSourceText(e.target.value)}
-            />
-            <div className="toolrow">
-              <button
-                className="tool"
-                id="mic"
-                onClick={handleMic}
-                title="Speech input"
-                style={isListening ? { borderColor: 'var(--green)', color: 'var(--green)', background: '#168f7020' } : undefined}
-              >
-                <svg viewBox="0 0 24 24">
-                  <rect x="9" y="2" width="6" height="12" rx="3" />
-                  <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8" />
-                </svg>
-                <span>{isListening ? 'Listening… (Click to stop)' : 'Mic'}</span>
-              </button>
-
-              <button
-                className="tool"
-                id="camera"
-                onClick={() => {
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.capture = 'environment';
-                  input.onchange = (e: any) => handleProcessImage(e.target.files[0]);
-                  input.click();
-                }}
-                title="Camera"
-              >
-                <svg viewBox="0 0 24 24">
-                  <path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" />
-                  <circle cx="12" cy="13" r="4" />
-                </svg>
-                <span>Camera</span>
-              </button>
-
-              <button
-                className="tool"
-                id="image"
-                onClick={() => imageFileInputRef.current?.click()}
-                title="Choose image"
-              >
-                <svg viewBox="0 0 24 24">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
-                  <path d="M14 2v6h6M8 13h8M8 17h8" />
-                </svg>
-                <span>Image</span>
-              </button>
-
-              <button
-                className="tool"
-                id="file"
-                onClick={() => anyFileInputRef.current?.click()}
-                title="Upload file"
-              >
-                <svg viewBox="0 0 24 24">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
-                  <path d="M14 2v6h6M8 13h8M8 17h8" />
-                </svg>
-                <span>File</span>
-              </button>
-
-              <button
-                className="tool"
-                id="paste"
-                onClick={handlePaste}
-                title="Paste from clipboard"
-              >
-                <svg viewBox="0 0 24 24">
-                  <rect x="8" y="3" width="12" height="17" rx="2" />
-                  <path d="M16 3V2H6a2 2 0 0 0-2 2v14h4M11 8h6M11 12h6M11 16h4" />
-                </svg>
-                <span>Paste</span>
-              </button>
-
-              <button className="tool clear" id="clear" onClick={handleClear}>
-                Clear
-              </button>
-
-              <input
-                type="file"
-                id="imageFile"
-                ref={imageFileInputRef}
-                accept="image/*"
-                onChange={handleImageFileChange}
-              />
-              <input
-                type="file"
-                id="anyFile"
-                ref={anyFileInputRef}
-                accept="image/*,.txt"
-                onChange={handleAnyFileChange}
-              />
+        <section className="hero">
+          <div>
+            <h1>Translate naturally.<br />Connect with everyone.</h1>
+            <p>Translate text between languages with a simple, clear workspace. Type, listen, or prepare an image for translation.</p>
+            <div className="chips">
+              <span className="chip">⚡ Simple to use</span>
+              <span className="chip">◆ Multiple languages</span>
+              <span className="chip">◎ Text, voice & image tools</span>
             </div>
-          </section>
+          </div>
+          <div className="hero-art" aria-hidden="true">
+            <div className="language-tile">Hello <span>English</span></div>
+            <div style={{ fontSize: '28px', color: 'var(--green)', padding: '0 15px', position: 'relative', zIndex: 1 }}>⇄</div>
+            <div className="language-tile">سلام <span>Urdu</span></div>
+          </div>
+        </section>
 
-          <button
-            className="primary"
-            id="translate"
-            onClick={handleTranslate}
-            disabled={isTranslating}
-          >
-            {isTranslating ? 'Translating…' : 'Translate / Analyze'}
-          </button>
+        <main>
+          <div className="translator-wrap" id="translator">
+            <div className="translator">
+              <div className="translator-heading">
+                <div>
+                  <h2>Online Language Translator</h2>
+                  <p>Choose languages and enter the text you want to translate.</p>
+                </div>
+              </div>
 
-          <section className="panel">
-            <div className="resulthead">
-              <strong>Translation result</strong>
-              <div className="resulttools">
-                <button
-                  className="iconbtn"
-                  id="listen"
-                  onClick={handleListen}
-                  title="Listen to result"
-                  aria-label="Listen"
+              <div className="languages">
+                <select
+                  id="from"
+                  aria-label="Source language"
+                  value={fromLang}
+                  onChange={(e) => setFromLang(e.target.value)}
                 >
-                  <svg viewBox="0 0 24 24">
-                    <path d="M4 10v4h4l5 4V6l-5 4H4Z" />
-                    <path d="M17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
-                  </svg>
-                </button>
+                  <option>English</option>
+                  <option>Urdu</option>
+                  <option>Hindi</option>
+                  <option>Punjabi</option>
+                  <option>Arabic</option>
+                  <option>French</option>
+                  <option>Spanish</option>
+                </select>
                 <button
-                  className="iconbtn"
-                  id="copy"
-                  onClick={handleCopy}
-                  title="Copy result"
-                  aria-label="Copy"
+                  className="swap"
+                  id="swap"
+                  onClick={handleSwap}
+                  aria-label="Swap languages"
+                  title="Swap languages"
                 >
-                  <svg viewBox="0 0 24 24">
-                    <rect x="8" y="8" width="13" height="13" rx="2" />
-                    <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
-                  </svg>
+                  ⇄
                 </button>
-                <button
-                  className="iconbtn"
-                  id="share"
-                  onClick={handleShare}
-                  title="Share result"
-                  aria-label="Share"
+                <select
+                  id="to"
+                  aria-label="Target language"
+                  value={toLang}
+                  onChange={(e) => setToLang(e.target.value)}
                 >
-                  <svg viewBox="0 0 24 24">
-                    <circle cx="18" cy="5" r="3" />
-                    <circle cx="6" cy="12" r="3" />
-                    <circle cx="18" cy="19" r="3" />
-                    <path d="m8.7 10.7 6.6-4.4m-6.6 9 6.6 2.9" />
-                  </svg>
-                </button>
+                  <option>Urdu</option>
+                  <option>English</option>
+                  <option>Hindi</option>
+                  <option>Punjabi</option>
+                  <option>Arabic</option>
+                  <option>French</option>
+                  <option>Spanish</option>
+                </select>
+              </div>
+
+              <section className="pane">
+                <textarea
+                  id="source"
+                  placeholder="Type or paste text here…"
+                  aria-label="Text to translate"
+                  value={sourceText}
+                  onChange={(e) => setSourceText(e.target.value)}
+                />
+                <div className="toolrow">
+                  <button
+                    className="tool"
+                    id="mic"
+                    onClick={handleMic}
+                    title="Speech input"
+                    style={isListening ? { borderColor: 'var(--green)', color: 'var(--green)', background: '#168f7020' } : undefined}
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <rect x="9" y="2" width="6" height="12" rx="3" />
+                      <path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8" />
+                    </svg>
+                    <span>{isListening ? 'Listening…' : 'Mic'}</span>
+                  </button>
+
+                  <button
+                    className="tool"
+                    id="camera"
+                    onClick={() => {
+                      const input = document.createElement('input');
+                      input.type = 'file';
+                      input.accept = 'image/*';
+                      input.capture = 'environment';
+                      input.onchange = (e: any) => handleProcessImage(e.target.files[0]);
+                      input.click();
+                    }}
+                    title="Camera"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" />
+                      <circle cx="12" cy="13" r="4" />
+                    </svg>
+                    <span>Camera</span>
+                  </button>
+
+                  <button
+                    className="tool"
+                    id="image"
+                    onClick={() => imageFileInputRef.current?.click()}
+                    title="Choose image"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+                      <path d="M14 2v6h6M8 13h8M8 17h8" />
+                    </svg>
+                    <span>Image</span>
+                  </button>
+
+                  <button
+                    className="tool"
+                    id="file"
+                    onClick={() => anyFileInputRef.current?.click()}
+                    title="Upload file"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" />
+                      <path d="M14 2v6h6M8 13h8M8 17h8" />
+                    </svg>
+                    <span>File</span>
+                  </button>
+
+                  <button
+                    className="tool"
+                    id="paste"
+                    onClick={handlePaste}
+                    title="Paste from clipboard"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <rect x="8" y="3" width="12" height="17" rx="2" />
+                      <path d="M16 3V2H6a2 2 0 0 0-2 2v14h4M11 8h6M11 12h6M11 16h4" />
+                    </svg>
+                    <span>Paste</span>
+                  </button>
+
+                  <button className="tool clear" id="clear" onClick={handleClear}>
+                    Clear
+                  </button>
+
+                  <input
+                    type="file"
+                    id="imageFile"
+                    ref={imageFileInputRef}
+                    accept="image/*"
+                    onChange={handleImageFileChange}
+                  />
+                  <input
+                    type="file"
+                    id="anyFile"
+                    ref={anyFileInputRef}
+                    accept="image/*,.txt"
+                    onChange={handleAnyFileChange}
+                  />
+                </div>
+              </section>
+
+              <button
+                className="primary"
+                id="translate"
+                onClick={handleTranslate}
+                disabled={isTranslating}
+              >
+                {isTranslating ? 'Translating…' : 'Translate / Analyze'}
+              </button>
+
+              <section className="panel" style={{ marginBottom: 0 }}>
+                <div className="resulthead">
+                  <strong>Translation result</strong>
+                  <div className="resulttools">
+                    <button
+                      className="iconbtn"
+                      id="listen"
+                      onClick={handleListen}
+                      title="Listen to result"
+                      aria-label="Listen"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <path d="M4 10v4h4l5 4V6l-5 4H4Z" />
+                        <path d="M17 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
+                      </svg>
+                    </button>
+                    <button
+                      className="iconbtn"
+                      id="copy"
+                      onClick={handleCopy}
+                      title="Copy result"
+                      aria-label="Copy"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <rect x="8" y="8" width="13" height="13" rx="2" />
+                        <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" />
+                      </svg>
+                    </button>
+                    <button
+                      className="iconbtn"
+                      id="share"
+                      onClick={handleShare}
+                      title="Share result"
+                      aria-label="Share"
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <circle cx="18" cy="5" r="3" />
+                        <circle cx="6" cy="12" r="3" />
+                        <circle cx="18" cy="19" r="3" />
+                        <path d="m8.7 10.7 6.6-4.4m-6.6 9 6.6 2.9" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <div className="resulttext" id="result">
+                  {resultText}
+                </div>
+              </section>
+
+              <div className="status" id="status" role="status" style={{ marginTop: '12px' }}>
+                {statusText}
               </div>
             </div>
-            <div className="resulttext" id="result">
-              {resultText}
+          </div>
+
+          <section className="quick" aria-label="Quick tools">
+            <button onClick={() => { setFromLang('English'); setToLang('Urdu'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+              <span className="qicon qgreen">🎙</span><span>Voice Translation</span>
+            </button>
+            <button onClick={() => { imageFileInputRef.current?.click(); }}>
+              <span className="qicon qpurple">📷</span><span>Image Translation</span>
+            </button>
+            <button onClick={() => { setSourceText('PDF Document translation support.'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+              <span className="qicon qred">▣</span><span>PDF Tools</span>
+            </button>
+            <button onClick={() => { setSourceText('Text formatting & cleanup.'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+              <span className="qicon qblue">⌨</span><span>Text Tools</span>
+            </button>
+          </section>
+
+          <section className="section" id="tools">
+            <div className="sectionhead">
+              <div>
+                <h2>Useful language tools</h2>
+                <p>Quick utilities to help with everyday text and documents.</p>
+              </div>
+            </div>
+            <div className="toolsgrid">
+              <button className="toolcard" onClick={() => { setFromLang('Urdu'); setToLang('English'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                <span className="toolicon qpurple">⌨</span>
+                <div>
+                  <strong>Urdu ↔ English Typing</strong>
+                  <small>Type in Urdu or English with ease</small>
+                </div>
+                <span className="arrow">›</span>
+              </button>
+              <button className="toolcard" onClick={() => { setSourceText('Text to image preview'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}>
+                <span className="toolicon qred">▧</span>
+                <div>
+                  <strong>Text to Image</strong>
+                  <small>Preview tool & utilities</small>
+                </div>
+                <span className="arrow">›</span>
+              </button>
+              <button className="toolcard" onClick={() => { imageFileInputRef.current?.click(); }}>
+                <span className="toolicon qblue">A</span>
+                <div>
+                  <strong>Image to Text (OCR)</strong>
+                  <small>Extract text from images using Gemini Vision</small>
+                </div>
+                <span className="arrow">›</span>
+              </button>
             </div>
           </section>
 
-          <div className="status" id="status" role="status">
-            {statusText}
-          </div>
+          <section className="section" id="languages">
+            <div className="sectionhead">
+              <h2>Popular Languages</h2>
+            </div>
+            <div className="chips">
+              <span className="chip">🇬🇧 English</span>
+              <span className="chip">🇵🇰 Urdu</span>
+              <span className="chip">🇸🇦 Arabic</span>
+              <span className="chip">🇨🇳 Chinese</span>
+              <span className="chip">🇰🇷 Korean</span>
+              <span className="chip">🇮🇳 Hindi</span>
+              <span className="chip">🟢 Punjabi</span>
+              <span className="chip">🇯🇵 Japanese</span>
+            </div>
+          </section>
+
+          <section className="section" id="about">
+            <div className="sectionhead">
+              <div>
+                <h2>Designed for clear communication</h2>
+                <p>A straightforward place to work with language, text and speech.</p>
+              </div>
+            </div>
+            <div className="info-grid">
+              <div className="info-card">
+                <h3>Easy language selection</h3>
+                <p>Select your source and target languages, then switch them whenever you need.</p>
+              </div>
+              <div className="info-card">
+                <h3>Text and voice tools</h3>
+                <p>Type text, use supported browser voice input, and listen to text where speech is available.</p>
+              </div>
+              <div className="info-card">
+                <h3>Simple, responsive layout</h3>
+                <p>Use the same clean interface on a mobile phone, tablet or desktop browser.</p>
+              </div>
+            </div>
+          </section>
 
           <div
             className="app-description"
             style={{
-              marginTop: '14px',
+              maxWidth: '1160px',
+              margin: '0 auto 48px',
+              padding: '0 24px',
               fontSize: '13px',
               lineHeight: '1.6',
               color: 'var(--muted)',
@@ -935,7 +1068,9 @@ export default function App() {
           </div>
         </main>
 
-        <div className="footer">Language Translator · Connected & Functional</div>
+        <div className="footer">
+          <strong>Language Translator</strong> · Translate · Type · Listen · Connect
+        </div>
       </div>
 
       <div
@@ -976,6 +1111,19 @@ export default function App() {
           <label className="label">Install App (PWA)</label>
           <button className="install" id="install" onClick={handleInstallClick}>
             Install App
+          </button>
+
+          <label className="label">GitHub Integration</label>
+          <button
+            className="install"
+            id="githubSync"
+            onClick={() => {
+              window.open('https://github.com/azizme12345-bot/Language-translation-', '_blank');
+              setStatusText('Opened GitHub repository.');
+            }}
+            style={{ background: '#24292e' }}
+          >
+            Open GitHub Repository
           </button>
 
           <label className="label">Gemini AI Model Versions</label>
