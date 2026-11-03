@@ -67,34 +67,15 @@ export default {
       });
     }
 
-    // 2. Dynamic Sitemap.xml matching requested host (Googlebot & Bing friendly)
+    // 2. Dynamic Sitemap.xml: only the homepage (other routes are not indexed separately)
     if (pathname === '/sitemap.xml' || pathname === '/sitemap_index.xml' || pathname === '/sitemap') {
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${origin}/</loc>
-    <lastmod>2026-10-25</lastmod>
+    <lastmod>2026-11-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="${origin}/" />
-    <xhtml:link rel="alternate" hreflang="ur" href="${origin}/" />
-  </url>
-  <url>
-    <loc>${origin}/english-to-urdu</loc>
-    <lastmod>2026-10-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="en" href="${origin}/english-to-urdu" />
-    <xhtml:link rel="alternate" hreflang="ur" href="${origin}/english-to-urdu" />
-  </url>
-  <url>
-    <loc>${origin}/urdu-to-english</loc>
-    <lastmod>2026-10-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-    <xhtml:link rel="alternate" hreflang="ur" href="${origin}/urdu-to-english" />
-    <xhtml:link rel="alternate" hreflang="en" href="${origin}/urdu-to-english" />
   </url>
 </urlset>`;
       return new Response(sitemap, {
