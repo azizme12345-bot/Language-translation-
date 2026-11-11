@@ -702,10 +702,10 @@ export default function App() {
             <span>Translate · Type · Listen · Connect</span>
           </div>
           <nav className="webnav" aria-label="Main navigation">
-            <a href="#translator">Translator</a>
-            <a href="#tools">Tools</a>
-            <a href="#languages">Languages</a>
-            <a href="#about">About</a>
+            <a href="/">Home</a>
+            <a href="/about.html">About</a>
+            <a href="/privacy.html">Privacy</a>
+            <a href="/contact.html">Contact</a>
           </nav>
           <button
             className="iconbtn"
@@ -1066,11 +1066,87 @@ export default function App() {
           >
             This is an online English and Urdu translator. You can type text and get the translation instantly. Press the mic button to translate by speaking. Take a photo with the camera to translate the text in it. Upload an image or a file to translate its content. You can listen to the translation with the audio button. Copy the translation easily and use it anywhere. You can also share it with others using the share button.
           </div>
+          <section className="section" id="guide">
+            <div className="sectionhead">
+              <div>
+                <h2>How to use the English to Urdu Translator</h2>
+                <p>Follow these three simple steps to translate text or speech.</p>
+              </div>
+            </div>
+            <div className="info-grid">
+              <div className="info-card">
+                <h3>1. Type or speak</h3>
+                <p>Enter your text into the box, paste from your clipboard, or press the Mic button to speak naturally.</p>
+              </div>
+              <div className="info-card">
+                <h3>2. Check the result</h3>
+                <p>Click Translate / Analyze and review your accurate translation in the output panel right away.</p>
+              </div>
+              <div className="info-card">
+                <h3>3. Listen to the translation</h3>
+                <p>Press the speaker button to hear the translated text spoken aloud, or copy and share it anywhere.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="section" id="why-use">
+            <div className="sectionhead">
+              <div>
+                <h2>Why use this translator</h2>
+                <p>Built for everyday communication between English and Urdu.</p>
+              </div>
+            </div>
+            <div className="info-grid">
+              <div className="info-card">
+                <h3>Fast results</h3>
+                <p>Get instant translations for words, sentences, and uploaded text or images without waiting.</p>
+              </div>
+              <div className="info-card">
+                <h3>Simple to use</h3>
+                <p>A clean, distraction-free workspace that works smoothly on phones, tablets, and desktop browsers.</p>
+              </div>
+              <div className="info-card">
+                <h3>Completely free</h3>
+                <p>Translate text, voice, camera photos, and files online at no cost with no sign-up required.</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="section" id="faq">
+            <div className="sectionhead">
+              <div>
+                <h2>Frequently asked questions</h2>
+                <p>Common questions about using Language Translator.</p>
+              </div>
+            </div>
+            <div className="info-grid">
+              <div className="info-card">
+                <h3>Is it free?</h3>
+                <p>Yes. Language Translator is completely free to use online for text, voice, image, and file translations.</p>
+              </div>
+              <div className="info-card">
+                <h3>Can I hear the translation?</h3>
+                <p>Yes. After translating, click the speaker icon in the result box to listen to the audio pronunciation.</p>
+              </div>
+              <div className="info-card">
+                <h3>Can I translate Urdu to English too?</h3>
+                <p>Yes. Use the swap button between the language selectors to switch from English to Urdu or Urdu to English anytime.</p>
+              </div>
+            </div>
+          </section>
         </main>
 
-        <div className="footer">
-          <strong>Language Translator</strong> · Translate · Type · Listen · Connect
-        </div>
+        <footer className="footer">
+          <div>
+            <strong>Language Translator</strong> · Translate · Type · Listen · Connect
+          </div>
+          <nav aria-label="Footer navigation" style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '18px', flexWrap: 'wrap' }}>
+            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Home</a>
+            <a href="/about.html" style={{ color: 'inherit', textDecoration: 'none' }}>About</a>
+            <a href="/privacy.html" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
+            <a href="/contact.html" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</a>
+          </nav>
+        </footer>
       </div>
 
       <div

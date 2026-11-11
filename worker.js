@@ -67,15 +67,33 @@ export default {
       });
     }
 
-    // 2. Dynamic Sitemap.xml: only the homepage (other routes are not indexed separately)
+    // 2. Dynamic Sitemap.xml: all main pages
     if (pathname === '/sitemap.xml' || pathname === '/sitemap_index.xml' || pathname === '/sitemap') {
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${origin}/</loc>
-    <lastmod>2026-11-03</lastmod>
+    <lastmod>2026-11-10</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>${origin}/about.html</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>${origin}/privacy.html</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>${origin}/contact.html</loc>
+    <lastmod>2026-11-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>`;
       return new Response(sitemap, {
