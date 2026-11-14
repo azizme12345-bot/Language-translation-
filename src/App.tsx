@@ -62,6 +62,13 @@ export default function App() {
   const deferredPromptRef = useRef<any>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [currentRoute, setCurrentRoute] = useState(() => window.location.pathname.toLowerCase());
+
+  const navigate = (path: string) => {
+    window.history.pushState({}, '', path);
+    setCurrentRoute(path.toLowerCase());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Initialize theme and PWA install prompt handler
   useEffect(() => {
@@ -111,7 +118,12 @@ export default function App() {
 
   // Initialize language direction and update SEO title/description based on URL route
   useEffect(() => {
-    const path = window.location.pathname.toLowerCase();
+    const handlePopState = () => {
+      setCurrentRoute(window.location.pathname.toLowerCase());
+    };
+    window.addEventListener('popstate', handlePopState);
+
+    const path = currentRoute;
     const titleEl = document.querySelector('title');
     const descEl = document.querySelector('meta[name="description"]');
 
@@ -125,11 +137,21 @@ export default function App() {
       setToLang('Urdu');
       if (titleEl) titleEl.textContent = 'English to Urdu Translator · Free Online Translation';
       if (descEl) descEl.setAttribute('content', 'Free online English to Urdu translator. Translate English text, speech, camera and files instantly with accurate AI translation.');
+    } else if (path === '/about') {
+      if (titleEl) titleEl.textContent = 'About Us — English to Urdu Translator';
+    } else if (path === '/contact') {
+      if (titleEl) titleEl.textContent = 'Contact Us — English to Urdu Translator';
+    } else if (path === '/privacy-policy') {
+      if (titleEl) titleEl.textContent = 'Privacy Policy — English to Urdu Translator';
+    } else if (path === '/terms') {
+      if (titleEl) titleEl.textContent = 'Terms of Service — English to Urdu Translator';
     } else {
       if (titleEl) titleEl.textContent = 'English to Urdu Translator';
       if (descEl) descEl.setAttribute('content', 'Free online English and Urdu translator. Translate by typing, speaking, camera or file upload, and listen to the translation.');
     }
-  }, []);
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [currentRoute]);
 
   const toggleTheme = () => {
     const isDark = document.body.classList.toggle('dark');
@@ -692,6 +714,252 @@ export default function App() {
     setStatusText('PWA manifest and service worker are active. Use your browser menu to install this app.');
   };
 
+  const isInfoPage = ['/about', '/contact', '/privacy-policy', '/terms'].includes(currentRoute);
+
+  if (isInfoPage) {
+    return (
+      <div className="app">
+        <header className="topbar">
+          <a
+            href="/"
+            className="logo"
+            aria-label="Home"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/');
+            }}
+            style={{ textDecoration: 'none' }}
+          >
+            A文
+          </a>
+          <div className="brand">
+            <strong>Language Translator</strong>
+            <span>Translate · Type · Listen · Connect</span>
+          </div>
+          <nav className="webnav" aria-label="Main navigation">
+            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>Home</a>
+            <a href="/about" onClick={(e) => { e.preventDefault(); navigate('/about'); }}>About Us</a>
+            <a href="/contact" onClick={(e) => { e.preventDefault(); navigate('/contact'); }}>Contact Us</a>
+            <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigate('/privacy-policy'); }}>Privacy Policy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }}>Terms of Service</a>
+          </nav>
+          <button
+            className="iconbtn"
+            id="theme"
+            onClick={toggleTheme}
+            aria-label="Toggle light and dark mode"
+            title="Toggle theme"
+          >
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+            </svg>
+          </button>
+        </header>
+
+        <main className="section" style={{ paddingTop: '40px', paddingBottom: '40px', maxWidth: '820px' }}>
+          {currentRoute === '/about' && (
+            <article>
+              <h1 style={{ fontSize: '32px', margin: '0 0 16px' }}>About Us</h1>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Language Translator is a free online English to Urdu and Urdu to English translation tool designed to make everyday communication simple, fast, and accessible. It helps users translate typed text, spoken words, camera photos, images, and text files quickly from any modern web browser without requiring account registration or software downloads.
+              </p>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Whether you are studying, traveling, reading documents, or communicating across languages at work, you can enter text, use voice input, listen to the translated result, and copy or share your translation in seconds.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Our Mission and Purpose</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Language barriers often slow down learning, daily conversations, and access to helpful information. Our goal is to provide a clean, distraction-free translation workspace where anyone can move smoothly between English and Urdu—as well as other supported languages—with clarity and confidence. Instead of cluttering the screen with complicated menus, we focus on putting essential language tools right where you need them.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Translation Features and Tools</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Language Translator brings multiple ways to work with text and speech into one unified workspace. You can type or paste sentences directly into the input box, swap source and target languages with a single click, and review your translation immediately. When typing is inconvenient, the microphone tool lets you speak naturally and convert your speech into text for instant translation.
+              </p>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                For printed signs, study notes, screenshots, or documents, you can capture a photo using your device camera or upload an existing image or plain text file. Built-in text extraction reads the visible words from images and translates them into your chosen language. Once your translation is ready, you can click the listen button to hear audio pronunciation, copy the result to your clipboard, or share it directly with others.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Who Uses This Translator</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                This website is built for students practicing English and Urdu vocabulary, teachers preparing bilingual materials, travelers navigating new places, and families staying connected across generations. Professionals and everyday readers also rely on the tool to understand messages, articles, and everyday notes quickly without switching between multiple apps.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Designed for Every Device</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Language Translator works smoothly on mobile phones, tablets, laptops, and desktop computers. It includes light and dark display modes for comfortable reading at any time of day, and supports Progressive Web App (PWA) installation so you can launch it quickly from your home screen or desktop whenever you need a fast translation.
+              </p>
+              <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
+                We continuously maintain the interface to keep page loading fast, buttons easy to tap on touchscreens, and Urdu right-to-left typography clean and readable alongside English text. Whether you need a quick word lookup or help understanding a full paragraph, our focus remains on delivering an accurate, reliable, and free translation experience.
+              </p>
+            </article>
+          )}
+
+          {currentRoute === '/contact' && (
+            <article>
+              <h1 style={{ fontSize: '32px', margin: '0 0 16px' }}>Contact Us</h1>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                If you have any questions, feedback, suggestions, or problems while using the translator, please feel free to contact us. We welcome messages from visitors and appreciate hearing how we can make the translation experience clearer, faster, and more reliable for everyone.
+              </p>
+              <p style={{ color: 'var(--muted)', marginBottom: '18px' }}>
+                Email: <a href="mailto:Azizme12345@gmail.com" style={{ color: 'var(--green)', fontWeight: 650, textDecoration: 'none' }}>Azizme12345@gmail.com</a>
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>What You Can Reach Out About</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                You can email us regarding any part of the Language Translator website. Common reasons visitors write to us include reporting a technical issue with text, voice, camera, image, or file translation, sharing feedback about English to Urdu or Urdu to English translation quality, suggesting useful improvements or new language tools, and asking questions about our Privacy Policy or Terms of Service.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Helpful Details to Include in Your Message</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                When reporting a problem or bug, sharing a few extra details helps us investigate and resolve the issue more quickly. If possible, please mention the device and browser you are using (for example, Chrome on Android, Safari on iPhone, or a desktop browser), which feature you were trying to use (such as typing, microphone speech input, camera capture, image upload, file upload, or audio playback), the source and target languages selected, and a brief description of what happened or any status message displayed on screen.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Quick Checks Before Sending a Support Request</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                If the microphone button does not record your voice, check that your browser has permission to access your microphone and that no other app is using it. If an uploaded image does not extract text properly, try using a well-lit, sharp photo with clearly readable lettering. For file uploads, make sure you select either a supported image file or a plain text (.txt) file, and confirm you have an active internet connection before clicking Translate / Analyze. If audio playback does not start immediately, ensure your device volume is turned up and that silent mode is off on mobile phones.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Response Expectations and Privacy</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                We review incoming emails regularly and aim to respond to support questions, bug reports, and general inquiries as promptly as possible, typically within a few business days depending on message volume. Your email address and message details are used only to respond to your inquiry and assist with troubleshooting.
+              </p>
+              <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
+                Please avoid sending sensitive personal documents, passwords, government identification numbers, or private financial details by email. Thank you for using Language Translator and helping us improve the service for English and Urdu speakers everywhere.
+              </p>
+            </article>
+          )}
+
+          {currentRoute === '/terms' && (
+            <article>
+              <h1 style={{ fontSize: '32px', margin: '0 0 16px' }}>Terms of Service</h1>
+              <p style={{ color: 'var(--muted)', marginBottom: '18px' }}>Last updated: November 12, 2026</p>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Welcome to Language Translator. By accessing or using this website and its English to Urdu, Urdu to English, and multilingual translation tools, you agree to follow these Terms of Service. If you do not agree with any part of these terms, please discontinue using the website.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Free Service Provided "As Is"</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Language Translator is a free online service and is provided "as is" and "as available" without warranties of any kind, whether express or implied. We do not guarantee uninterrupted access, error-free operation, or that every feature will work identically on every browser, device, or network connection.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Translation Accuracy and User Responsibility</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Translations, speech transcriptions, image text extractions, and audio pronunciations are generated automatically using artificial intelligence and may not be 100% accurate. Automated translations can occasionally miss context, idioms, regional expressions, or technical phrasing. You are solely responsible for reviewing and verifying any output and for how you use the translations provided by this tool. This service should not be relied upon as a substitute for certified human translation in legal, medical, financial, immigration, or safety-critical matters.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Acceptable Use</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                You agree to use Language Translator only for lawful personal, educational, or everyday communication purposes. You must not misuse the service by attempting to disrupt our servers, bypass rate limits, send automated bulk scraping traffic, or upload unlawful, harmful, or malicious content through text, audio, image, or file inputs.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Third-Party Services and Advertisements</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Our translation and media processing features rely on third-party AI technology, and the website may display advertisements served by Google AdSense. Your interactions with external links or third-party services are governed by the respective terms and privacy policies of those providers.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Service Changes and Availability</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                We reserve the right to modify, update, suspend, or discontinue the service or any of its features at any time without prior notice. We may also update these Terms of Service periodically, and continued use of the website after updates constitutes acceptance of the revised terms.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Limitation of Liability</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                To the fullest extent permitted by applicable law, Language Translator and its operators shall not be liable for any direct, indirect, incidental, or consequential damages resulting from your use of, or inability to use, the website or any translated text, transcription, or audio output generated by the service. You use the website at your own discretion and risk.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Contact</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
+                If you have questions about these Terms of Service, please contact us at{' '}
+                <a href="mailto:Azizme12345@gmail.com" style={{ color: 'var(--green)', fontWeight: 650, textDecoration: 'none' }}>Azizme12345@gmail.com</a>.
+              </p>
+            </article>
+          )}
+
+          {currentRoute === '/privacy-policy' && (
+            <article>
+              <h1 style={{ fontSize: '32px', margin: '0 0 16px' }}>Privacy Policy</h1>
+              <p style={{ color: 'var(--muted)', marginBottom: '18px' }}>Last updated: November 12, 2026</p>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Your privacy matters to us. This Privacy Policy explains what information is processed when you visit and use Language Translator, how that information is handled to deliver translations and voice features, and how third-party services such as Google Gemini AI and Google AdSense operate on this website.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>What information is collected or processed</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                When you use the translator, any text you type or paste into the workspace, audio recorded from your microphone, photos taken with your camera, or uploaded image and plain text (.txt) files are processed solely to perform your requested translation, speech recognition, image text extraction, or text-to-speech playback. Text files selected from your device are read locally in your browser before the text is sent for translation. In your browser, localStorage is only used to save your light or dark theme preference and an optional custom API key if you choose to enter one. We do not require account sign-ups, names, or passwords to use the translator.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>How the information is used</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Your submitted text, audio recordings, and images are transmitted securely to our backend translation endpoints (/api/translate, /api/transcribe, /api/analyze-image, and /api/tts), which use the Google Gemini API to transcribe spoken words, extract readable text from images, translate content between languages, and generate audio pronunciation. We do not permanently store your translated text, voice recordings, or uploaded images in a user database on our servers.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Third-party services</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                We use Google Gemini AI to power translation, speech transcription, image OCR extraction, and text-to-speech audio generation. We also use Google AdSense to display advertisements that help keep this tool free to use. Google and its advertising partners may use cookies or similar technologies to serve ads based on your prior visits to this website or other websites on the internet. You can learn more about how Google uses data for advertising at{' '}
+                <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--green)', textDecoration: 'underline' }}>
+                  https://policies.google.com/technologies/ads
+                </a>.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Cookies and advertising choices</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                Third-party vendors, including Google, use cookies to serve ads based on a user's prior visits to this website or other websites. You may opt out of personalized advertising at any time by visiting Google Ads Settings or by adjusting cookie preferences directly in your web browser settings.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Data security and user precautions</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                All translation requests are handled over standard web connections, and we limit processing to what is needed to fulfill each request. Because online translation relies on external processing, we recommend that you avoid submitting highly confidential personal, medical, or financial information.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Children's privacy</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                This service is not intended for children under 13 years of age, and we do not knowingly collect personal information from children under 13.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Changes to this policy</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '14px' }}>
+                We may update this Privacy Policy from time to time to reflect improvements to the website or legal requirements. Any changes will be posted on this page with an updated revision date.
+              </p>
+
+              <h2 style={{ fontSize: '20px', margin: '24px 0 8px' }}>Contact</h2>
+              <p style={{ color: 'var(--muted)', marginBottom: '24px' }}>
+                If you have questions or concerns about this Privacy Policy, please contact us at{' '}
+                <a href="mailto:Azizme12345@gmail.com" style={{ color: 'var(--green)', fontWeight: 650, textDecoration: 'none' }}>Azizme12345@gmail.com</a>.
+              </p>
+            </article>
+          )}
+
+          <p style={{ marginTop: '24px' }}>
+            <a
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/');
+              }}
+              style={{ color: 'var(--green)', fontWeight: 650, textDecoration: 'none' }}
+            >
+              ← Back to Translator Home
+            </a>
+          </p>
+        </main>
+
+        <footer className="footer">
+          <div>
+            <strong>Language Translator</strong> · Translate · Type · Listen · Connect
+          </div>
+          <nav aria-label="Footer navigation" style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '18px', flexWrap: 'wrap' }}>
+            <a href="/about" onClick={(e) => { e.preventDefault(); navigate('/about'); }} style={{ color: 'inherit', textDecoration: 'none' }}>About Us</a>
+            <a href="/contact" onClick={(e) => { e.preventDefault(); navigate('/contact'); }} style={{ color: 'inherit', textDecoration: 'none' }}>Contact Us</a>
+            <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigate('/privacy-policy'); }} style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</a>
+          </nav>
+        </footer>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="app" id="home">
@@ -702,10 +970,11 @@ export default function App() {
             <span>Translate · Type · Listen · Connect</span>
           </div>
           <nav className="webnav" aria-label="Main navigation">
-            <a href="/">Home</a>
-            <a href="/about.html">About</a>
-            <a href="/privacy.html">Privacy</a>
-            <a href="/contact.html">Contact</a>
+            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }}>Home</a>
+            <a href="/about" onClick={(e) => { e.preventDefault(); navigate('/about'); }}>About Us</a>
+            <a href="/contact" onClick={(e) => { e.preventDefault(); navigate('/contact'); }}>Contact Us</a>
+            <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigate('/privacy-policy'); }}>Privacy Policy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }}>Terms of Service</a>
           </nav>
           <button
             className="iconbtn"
@@ -1064,7 +1333,12 @@ export default function App() {
               color: 'var(--muted)',
             }}
           >
-            This is an online English and Urdu translator. You can type text and get the translation instantly. Press the mic button to translate by speaking. Take a photo with the camera to translate the text in it. Upload an image or a file to translate its content. You can listen to the translation with the audio button. Copy the translation easily and use it anywhere. You can also share it with others using the share button.
+            <p style={{ margin: '0 0 10px' }}>
+              This is an online English and Urdu translator built for fast, everyday communication. You can type or paste text and get the translation instantly, or swap between English to Urdu, Urdu to English, and other popular languages in a single click. Press the microphone button to translate by speaking naturally, take a photo with your camera to read and translate printed text, or upload an image or plain text file directly from your device.
+            </p>
+            <p style={{ margin: 0 }}>
+              Once your translation appears, you can listen to clear audio pronunciation using the speaker button, copy the translated result to your clipboard with one tap, or share it with friends, classmates, and colleagues using the share button. Designed to run smoothly on mobile phones, tablets, and desktop computers with both light and dark modes, Language Translator makes reading, writing, and learning across languages effortless without requiring any account or download.
+            </p>
           </div>
           <section className="section" id="guide">
             <div className="sectionhead">
@@ -1141,10 +1415,10 @@ export default function App() {
             <strong>Language Translator</strong> · Translate · Type · Listen · Connect
           </div>
           <nav aria-label="Footer navigation" style={{ marginTop: '10px', display: 'flex', justifyContent: 'center', gap: '18px', flexWrap: 'wrap' }}>
-            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>Home</a>
-            <a href="/about.html" style={{ color: 'inherit', textDecoration: 'none' }}>About</a>
-            <a href="/privacy.html" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
-            <a href="/contact.html" style={{ color: 'inherit', textDecoration: 'none' }}>Contact</a>
+            <a href="/about" onClick={(e) => { e.preventDefault(); navigate('/about'); }} style={{ color: 'inherit', textDecoration: 'none' }}>About Us</a>
+            <a href="/contact" onClick={(e) => { e.preventDefault(); navigate('/contact'); }} style={{ color: 'inherit', textDecoration: 'none' }}>Contact Us</a>
+            <a href="/privacy-policy" onClick={(e) => { e.preventDefault(); navigate('/privacy-policy'); }} style={{ color: 'inherit', textDecoration: 'none' }}>Privacy Policy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} style={{ color: 'inherit', textDecoration: 'none' }}>Terms of Service</a>
           </nav>
         </footer>
       </div>
